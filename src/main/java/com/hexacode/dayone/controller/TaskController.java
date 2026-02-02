@@ -1,15 +1,13 @@
 package com.hexacode.dayone.controller;
 
-import com.hexacode.dayone.entity.ListTasks;
-import com.hexacode.dayone.entity.Task;
+import com.hexacode.dayone.entity.TaskDTO;
 import com.hexacode.dayone.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -20,19 +18,19 @@ public class TaskController {
 
     @GetMapping
     @RequestMapping("/getAllTasks")
-    public ResponseEntity<List<Task>> getAllTasks() {
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
     @PostMapping
     @RequestMapping("/createTask")
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid TaskDTO task) {
         return ResponseEntity.ok(taskService.createTask(task));
     }
 
     @PutMapping
     @RequestMapping("/update")
-    public ResponseEntity<Task> updateTask(@RequestBody Task task) {
+    public ResponseEntity<TaskDTO> updateTask(@RequestBody @Valid TaskDTO task) {
         return ResponseEntity.ok(taskService.updateTask(task));
     }
 

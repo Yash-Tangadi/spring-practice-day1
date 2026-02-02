@@ -1,6 +1,7 @@
 package com.hexacode.dayone.service;
 
 import com.hexacode.dayone.entity.Task;
+import com.hexacode.dayone.entity.TaskDTO;
 import com.hexacode.dayone.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,12 +14,34 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
 
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
+    public TaskDTO createTask(TaskDTO task) {
+        Task taskEntity = mapToEntity(task);
+        Task savedTask = taskRepository.save(taskEntity);
+        return  mapToDto(savedTask);
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    private Task mapToEntity(TaskDTO task){
+        return Task.builder()
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .completed(task.isCompleted())
+                .build();
+    }
+
+    private TaskDTO mapToDto(Task task){
+        return TaskDTO.builder()
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .completed(task.isCompleted())
+                .build();
+    }
+
+    public List<TaskDTO> getAllTasks() {
+        List<Task> allTasks = taskRepository.findAll();
+
+        return allTasks.stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     public boolean deleteTask(Long id) {
@@ -31,9 +54,12 @@ public class TaskService {
 
     }
 
-    public Task updateTask(Task task) {
-        Task existingTask = taskRepository.findById(task.getId())
-                .orElseThrow(() -> new RuntimeException("Task not found: " + task.getId()));
+    public TaskDTO updateTask(TaskDTO task) {
+
+        Task inputTask = mapToEntity(task);
+
+        Task existingTask = taskRepository.findById(inputTask.getId())
+                .orElseThrow(() -> new RuntimeException("Task not found: " + inputTask.getId()));
 
         existingTask.setTitle(task.getTitle());
         existingTask.setDescription(task.getDescription());
@@ -41,6 +67,6 @@ public class TaskService {
 
         taskRepository.save(existingTask);
 
-        return existingTask;
+        return mapToDto(existingTask);
     }
 }
